@@ -1,0 +1,12 @@
+packages:
+  - .
+
+ignoredBuiltDependencies:
+  - '@parcel/watcher'
+  - '@prisma/engines'
+  - '@swc/core'
+  - sharp
+  - unrs-resolver
+
+onlyBuiltDependencies:
+  - prisma
