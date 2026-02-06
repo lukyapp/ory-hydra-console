@@ -5,6 +5,7 @@ declare namespace NodeJS {
     ORY_HYDRA_ISSUER: string;
     ORY_HYDRA_CLIENT_ID: string;
     ORY_HYDRA_CLIENT_SECRET: string;
+    ORY_KRATOS_ADMIN_URL: string;
     DATABASE_URL: string;
     NEXTAUTH_URL: string;
     NEXTAUTH_SECRET: string;

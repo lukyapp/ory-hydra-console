@@ -41,6 +41,33 @@ export default function Home() {
               Create, view, edit, and delete OAuth 2.0 client applications
             </p>
           </Link>
+          <Link
+            href="/consents"
+            className="group rounded-lg border border-zinc-200 bg-white p-6 shadow-sm transition-all hover:border-emerald-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-emerald-700"
+          >
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="h-6 w-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 9h10.5a1.5 1.5 0 0 0 1.5-1.5v-6a1.5 1.5 0 0 0-1.5-1.5H6a1.5 1.5 0 0 0-1.5 1.5v6a1.5 1.5 0 0 0 1.5 1.5Z"
+                />
+              </svg>
+            </div>
+            <h2 className="mb-2 text-lg font-semibold text-zinc-900 group-hover:text-emerald-600 dark:text-zinc-100 dark:group-hover:text-emerald-400">
+              Consent Sessions
+            </h2>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              Revoke remembered consents by user or per application
+            </p>
+          </Link>
         </div>
       </div>
     </div>
