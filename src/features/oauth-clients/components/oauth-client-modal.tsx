@@ -1,7 +1,9 @@
 'use client';
 
 import type { OAuth2Client } from '@/features/oauth-clients/services/hydra-admin.service';
+import { useState } from 'react';
 import { OAuthClientForm } from './oauth-client-form';
+import { OAuthClientQuickForm } from './oauth-client-quick-form';
 
 interface OAuthClientModalProps {
   isOpen: boolean;
@@ -18,6 +20,9 @@ export function OAuthClientModal({
   onSubmit,
   isSubmitting,
 }: OAuthClientModalProps) {
+  const isEditing = Boolean(client);
+  const [createMode, setCreateMode] = useState<'simple' | 'advanced'>('simple');
+
   if (!isOpen) return null;
 
   return (
@@ -27,12 +32,47 @@ export function OAuthClientModal({
         <h2 className="mb-4 text-xl font-semibold text-zinc-900 dark:text-zinc-100">
           {client ? 'Edit OAuth Client' : 'Create OAuth Client'}
         </h2>
-        <OAuthClientForm
-          client={client}
-          onSubmit={onSubmit}
-          onCancel={onClose}
-          isSubmitting={isSubmitting}
-        />
+        {!isEditing && (
+          <div className="mb-4 flex gap-2">
+            <button
+              type="button"
+              onClick={() => setCreateMode('simple')}
+              className={`rounded-md border px-3 py-1.5 text-sm transition-colors ${
+                createMode === 'simple'
+                  ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                  : 'border-zinc-300 bg-white text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300'
+              }`}
+            >
+              Simple
+            </button>
+            <button
+              type="button"
+              onClick={() => setCreateMode('advanced')}
+              className={`rounded-md border px-3 py-1.5 text-sm transition-colors ${
+                createMode === 'advanced'
+                  ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                  : 'border-zinc-300 bg-white text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300'
+              }`}
+            >
+              Advanced
+            </button>
+          </div>
+        )}
+
+        {isEditing || createMode === 'advanced' ? (
+          <OAuthClientForm
+            client={client}
+            onSubmit={onSubmit}
+            onCancel={onClose}
+            isSubmitting={isSubmitting}
+          />
+        ) : (
+          <OAuthClientQuickForm
+            onSubmit={onSubmit}
+            onCancel={onClose}
+            isSubmitting={isSubmitting}
+          />
+        )}
       </div>
     </div>
   );
