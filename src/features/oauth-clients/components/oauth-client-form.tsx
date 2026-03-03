@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { OAuth2Client } from '@/features/oauth-clients/services/hydra-admin.service';
+import { validateOAuthUri } from '@/features/oauth-clients/utils/uri-validation';
 import { useMemo, useState } from 'react';
 
 interface OAuthClientFormProps {
@@ -96,24 +97,15 @@ export function OAuthClientForm({
     e.preventDefault();
     const validationErrors: Record<string, string> = {};
 
-    const validateUrl = (value: string, label: string) => {
-      if (!value.trim()) return null;
-      try {
-        const url = new URL(value);
-        if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-          return `${label} must start with http:// or https://.`;
-        }
-        return null;
-      } catch {
-        return `${label} must be a valid URL.`;
-      }
-    };
+    const validateUrl = (value: string, label: string, allowCustomScheme = false) =>
+      validateOAuthUri(value, { label, allowCustomScheme });
 
     const validateUrlList = (
       values: string[] | undefined,
       label: string,
       key: string,
       requireAtLeastOne = false,
+      allowCustomScheme = false,
     ) => {
       const cleaned = (values || []).map((value) => value.trim()).filter(Boolean);
       if (requireAtLeastOne && cleaned.length === 0) {
@@ -121,7 +113,7 @@ export function OAuthClientForm({
         return;
       }
       for (let i = 0; i < cleaned.length; i += 1) {
-        const error = validateUrl(cleaned[i], `${label} ${i + 1}`);
+        const error = validateUrl(cleaned[i], `${label} ${i + 1}`, allowCustomScheme);
         if (error) {
           validationErrors[key] = error;
           return;
@@ -148,7 +140,13 @@ export function OAuthClientForm({
       validationErrors.response_types = 'Select at least one response type.';
     }
 
-    validateUrlList(formData.redirect_uris, 'Redirect URI', 'redirect_uris', requireRedirectUris);
+    validateUrlList(
+      formData.redirect_uris,
+      'Redirect URI',
+      'redirect_uris',
+      requireRedirectUris,
+      true,
+    );
     const clientUriError = validateUrl(formData.client_uri || '', 'Client URI');
     if (clientUriError) validationErrors.client_uri = clientUriError;
 
@@ -190,6 +188,8 @@ export function OAuthClientForm({
       formData.post_logout_redirect_uris,
       'Post Logout Redirect URI',
       'post_logout_redirect_uris',
+      false,
+      true,
     );
     validateUrlList(formData.request_uris, 'Request URI', 'request_uris');
     validateUrlList(formData.allowed_cors_origins, 'Allowed CORS Origin', 'allowed_cors_origins');

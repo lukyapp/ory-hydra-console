@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { OAuth2Client } from '@/features/oauth-clients/services/hydra-admin.service';
+import { validateOAuthUri } from '@/features/oauth-clients/utils/uri-validation';
 import { useMemo, useState } from 'react';
 
 interface OAuthClientQuickFormProps {
@@ -62,15 +63,14 @@ export function OAuthClientQuickForm({
 
   const requiresRedirectUris = useMemo(() => !['api', 'service'].includes(appType), [appType]);
 
-  const validateUrlList = (values: string[], label: string) => {
+  const validateUrlList = (values: string[], label: string, allowCustomScheme = false) => {
     for (let i = 0; i < values.length; i += 1) {
-      try {
-        const url = new URL(values[i]);
-        if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-          return `${label} must start with http:// or https://.`;
-        }
-      } catch {
-        return `${label} must be valid URLs.`;
+      const error = validateOAuthUri(values[i], {
+        label,
+        allowCustomScheme,
+      });
+      if (error) {
+        return error;
       }
     }
     return null;
@@ -93,7 +93,7 @@ export function OAuthClientQuickForm({
     }
 
     if (requiresRedirectUris && redirectUris.length > 0) {
-      const redirectError = validateUrlList(redirectUris, 'Redirect URIs');
+      const redirectError = validateUrlList(redirectUris, 'Redirect URIs', true);
       if (redirectError) validationErrors.redirect_uris = redirectError;
     }
 
@@ -214,11 +214,18 @@ export function OAuthClientQuickForm({
             <textarea
               value={redirectUrisRaw}
               onChange={(e) => setRedirectUrisRaw(e.target.value)}
-              placeholder="https://app.example.com/callback"
+              placeholder={
+                appType === 'native'
+                  ? 'myapp://callback\nhttps://app.example.com/callback'
+                  : 'https://app.example.com/callback'
+              }
               className="min-h-[96px] w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-800"
               aria-invalid={Boolean(errors.redirect_uris)}
             />
-            <p className="mt-1 text-xs text-zinc-500">One per line or comma-separated.</p>
+            <p className="mt-1 text-xs text-zinc-500">
+              One per line or comma-separated. Supports `http(s)` and app links such as
+              `myapp://callback`.
+            </p>
             {errors.redirect_uris && (
               <p className="mt-1 text-xs text-red-600">{errors.redirect_uris}</p>
             )}
